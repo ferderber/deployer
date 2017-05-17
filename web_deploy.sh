@@ -6,4 +6,4 @@ git clone $1 \
     && cd /tmp/$2 \
     && yarn \
     && yarn run build \
-    && rsync -anv /tmp/$2 $HOME/www/$3 
+    && rsync -a /tmp/$2 /var/www/$3
