@@ -10,5 +10,5 @@ A simple web server that deploys `node` and `web` applications when a new releas
 
 ## Usage
 
-I run the tool in the background with [PM2(https://github.com/Unitech/pm2)].
+I run the tool in the background with [PM2](https://github.com/Unitech/pm2).
 
