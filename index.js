@@ -4,6 +4,7 @@ const config = require('./config');
 const chalk = require('chalk');
 const spawn = require('child_process').spawn;
 const crypto = require('crypto');
+const request = require('request');
 
 const app = new Koa();
 
@@ -38,18 +39,40 @@ app.use(async (ctx) => {
         default:
           break;
       }
+      ctx.status = 200;
+      request.post({
+        url: `${ctx.request.body.deployment.url}/statuses`,
+        headers: {
+          Authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
+        },
+        body: {
+          state: 'pending',
+          description: 'Deployment in progress',
+        },
+      }, (err, res) => {
+        if (err) { console.log(err); } else { console.log(res); }
+      });
       console.log(chalk.bgCyan.black(`===Deploying ${repo.name}===`));
       deploy.stdout.on('data', data => console.log(formatOutput(repo, data)));
       deploy.stderr.on('data', data => console.error(formatOutput(repo, data)));
 
-      const status = await new Promise(resolve =>
-        deploy.on('close', (code) => {
-          let color = chalk.bgCyan.black;
-          if (code !== 0) { color = chalk.bgRed.black; }
-          console.log(color(`===${repo.name} deployment closed with code ${code}===`));
-          resolve(code);
-        }));
-      if (status !== 0) { ctx.status = 500; } else { ctx.status = 200; }
+      deploy.on('close', (code) => {
+        let color = chalk.bgCyan.black;
+        if (code !== 0) { color = chalk.bgRed.black; }
+        console.log(color(`===${repo.name} deployment closed with code ${code}===`));
+        request.post({
+          url: `${ctx.request.body.deployment.url}/statuses`,
+          headers: {
+            Authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
+          },
+          body: {
+            state: 'success',
+            description: 'Deployed successfully',
+          },
+        }, (err, res) => {
+          if (err) { console.log(err); } else { console.log(res); }
+        });
+      });
     }
   } else { ctx.status = 400; }
 });
