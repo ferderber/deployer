@@ -45,6 +45,7 @@ app.use(async (ctx) => {
         headers: {
           Authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
+          'User-Agent': 'request',
         },
         body: JSON.stringify({
           state: 'pending',
@@ -66,6 +67,7 @@ app.use(async (ctx) => {
           headers: {
             Authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
             'Content-Type': 'application/json',
+            'User-Agent': 'request',
           },
           body: JSON.stringify({
             state: 'success',
