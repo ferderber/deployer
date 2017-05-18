@@ -7,4 +7,4 @@ git clone $1 \
     && yarn \
     && yarn run build \
     && mkdir -p /var/www/$3/$2 \
-    && rsync -a --delete /tmp/$2/dist/ /var/www/$3/$2 \
+    && rsync -a --delete /tmp/$2/dist/ /var/www/$3/$2
