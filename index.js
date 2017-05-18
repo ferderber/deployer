@@ -31,8 +31,8 @@ function updateStatus(deploymentUrl, status) {
       'User-Agent': 'request',
     },
     body: JSON.stringify(status),
-  }, (err, res) => {
-    if (err) { console.log(err); } else { console.log(res); }
+  }, (err) => {
+    if (err) { console.log(err); }
   });
 }
 
