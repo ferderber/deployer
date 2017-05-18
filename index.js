@@ -44,11 +44,12 @@ app.use(async (ctx) => {
         url: `${ctx.request.body.deployment.url}/statuses`,
         headers: {
           Authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
+          'Content-Type': 'application/json',
         },
-        body: {
+        body: JSON.stringify({
           state: 'pending',
           description: 'Deployment in progress',
-        },
+        }),
       }, (err, res) => {
         if (err) { console.log(err); } else { console.log(res); }
       });
@@ -64,11 +65,12 @@ app.use(async (ctx) => {
           url: `${ctx.request.body.deployment.url}/statuses`,
           headers: {
             Authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json',
           },
-          body: {
+          body: JSON.stringify({
             state: 'success',
             description: 'Deployed successfully',
-          },
+          }),
         }, (err, res) => {
           if (err) { console.log(err); } else { console.log(res); }
         });
