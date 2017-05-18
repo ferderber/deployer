@@ -22,6 +22,20 @@ function verifySignature() {
     if (`sha1=${hmac}` === signature) { await next(); } else { ctx.status = 401; }
   };
 }
+function updateStatus(deploymentUrl, status) {
+  request.post({
+    url: `${deploymentUrl}/statuses`,
+    headers: {
+      Authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+      'User-Agent': 'request',
+    },
+    body: JSON.stringify(status),
+  }, (err, res) => {
+    if (err) { console.log(err); } else { console.log(res); }
+  });
+}
+
 app.use(kbody());
 app.use(verifySignature());
 app.use(async (ctx) => {
@@ -40,20 +54,7 @@ app.use(async (ctx) => {
           break;
       }
       ctx.status = 200;
-      request.post({
-        url: `${ctx.request.body.deployment.url}/statuses`,
-        headers: {
-          Authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
-          'Content-Type': 'application/json',
-          'User-Agent': 'request',
-        },
-        body: JSON.stringify({
-          state: 'pending',
-          description: 'Deployment in progress',
-        }),
-      }, (err, res) => {
-        if (err) { console.log(err); } else { console.log(res); }
-      });
+      updateStatus(ctx.request.body.deployment.url, { state: 'pending', description: 'Deployment in progress' });
       console.log(chalk.bgCyan.black(`===Deploying ${repo.name}===`));
       deploy.stdout.on('data', data => console.log(formatOutput(repo, data)));
       deploy.stderr.on('data', data => console.error(formatOutput(repo, data)));
@@ -62,20 +63,7 @@ app.use(async (ctx) => {
         let color = chalk.bgCyan.black;
         if (code !== 0) { color = chalk.bgRed.black; }
         console.log(color(`===${repo.name} deployment closed with code ${code}===`));
-        request.post({
-          url: `${ctx.request.body.deployment.url}/statuses`,
-          headers: {
-            Authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`,
-            'Content-Type': 'application/json',
-            'User-Agent': 'request',
-          },
-          body: JSON.stringify({
-            state: 'success',
-            description: 'Deployed successfully',
-          }),
-        }, (err, res) => {
-          if (err) { console.log(err); } else { console.log(res); }
-        });
+        updateStatus(ctx.request.body.deployment.url, { state: 'success', description: 'Deployed successfully' });
       });
     }
   } else { ctx.status = 400; }
