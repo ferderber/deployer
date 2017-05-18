@@ -9,7 +9,7 @@ const app = new Koa();
 
 function formatOutput(repo, data) {
   return `${chalk.black.bgGreen(`[${repo.name}]`)} ${chalk.yellow(new Date().toLocaleString())}: ` +
-        `${(data.toString().split('\n').length >= 3 ? '\n' : '') + data}`;
+    `${(data.toString().split('\n').length >= 3 ? '\n' : '') + data}`;
 }
 
 // Validate that the x-hub-signature is valid
@@ -24,7 +24,7 @@ function verifySignature() {
 app.use(kbody());
 app.use(verifySignature());
 app.use(async (ctx) => {
-  if (ctx.request.url === '/deploy_handler' && ctx.request.headers['x-github-event'] === 'release') {
+  if (ctx.request.url.includes('/deploy_handler') && ctx.request.headers['x-github-event'] === 'deployment') {
     const repo = config[ctx.request.body.repository.full_name];
     if (repo) {
       let deploy;
@@ -43,15 +43,15 @@ app.use(async (ctx) => {
       deploy.stderr.on('data', data => console.error(formatOutput(repo, data)));
 
       const status = await new Promise(resolve =>
-                deploy.on('close', (code) => {
-                  let color = chalk.bgCyan.black;
-                  if (code !== 0) { color = chalk.bgRed.black; }
-                  console.log(color(`===${repo.name} deployment closed with code ${code}===`));
-                  resolve(code);
-                }));
+        deploy.on('close', (code) => {
+          let color = chalk.bgCyan.black;
+          if (code !== 0) { color = chalk.bgRed.black; }
+          console.log(color(`===${repo.name} deployment closed with code ${code}===`));
+          resolve(code);
+        }));
       if (status !== 0) { ctx.status = 500; } else { ctx.status = 200; }
     }
-  }
+  } else { ctx.status = 400; }
 });
 
 app.listen(8000);
