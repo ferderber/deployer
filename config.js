@@ -10,4 +10,9 @@ module.exports = {
     git_url: 'https://github.com/matthewferderber/league-quest.git',
     location: 'cobaltium.net',
   },
+  'matthewferderber/co-bot': {
+    type: 'node',
+    name: 'co-bot',
+    git_url: 'https://github.com/matthewferderber/co-bot.git',
+  },
 };
