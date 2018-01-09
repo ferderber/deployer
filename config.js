@@ -15,4 +15,15 @@ module.exports = {
     name: 'co-bot',
     git_url: 'https://github.com/matthewferderber/co-bot.git',
   },
+  'matthewferderber/league-rank-api': {
+    type: 'node',
+    name: 'league-rank-api',
+    git_url: 'https://github.com/matthewferderber/league-rank-api.git',
+  },
+  'matthewferderber/league-rank': {
+    type: 'web',
+    name: 'league-rank',
+    git_url: 'https://github.com/matthewferderber/league-rank.git',
+    location: 'cobaltium.net',
+  },
 };
