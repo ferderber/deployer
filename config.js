@@ -11,9 +11,12 @@ module.exports = {
     location: 'cobaltium.net',
   },
   'matthewferderber/co-bot': {
-    type: 'node',
+    type: 'docker',
     name: 'co-bot',
     git_url: 'https://github.com/matthewferderber/co-bot.git',
+    image_name: 'matthewferderber/co-bot',
+    tag: 'latest',
+    arguments: ['-e DISCORD_BOT_TOKEN=$DISCORD_BOT_TOKEN', '-e LEAGUE_API_KEY=$LEAGUE_API_KEY']
   },
   'matthewferderber/league-rank-api': {
     type: 'node',

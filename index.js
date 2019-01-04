@@ -36,14 +36,25 @@ function updateStatus(deploymentUrl, status) {
   });
 }
 
+function getName(body) {
+  if (body.repository.full_name) {
+    return body.repository.full_name;
+  } else if (body.repository.name) {
+    return body.repository.name;
+  }
+  return null;
+}
+
 app.use(kbody());
 app.use(verifySignature());
 app.use(async (ctx) => {
-  if (ctx.request.url.includes('/deploy_handler') && ctx.request.headers['x-github-event'] === 'deployment') {
-    const repo = config[ctx.request.body.repository.full_name];
+  if (ctx.request.url.includes('/deploy_handler') && (ctx.request.headers['x-github-event'] === 'deployment' || ctx.request.body.repository.dockerfile)) {
+    const repo = config[getName(ctx.request.body)];
     if (repo) {
       let deploy;
       switch (repo.type) {
+        case 'docker':
+          deploy = spawn('sh', ['docker_deploy.sh', repo.image_name, repo.tag, repo.name]);
         case 'node':
           deploy = spawn('sh', ['node_deploy.sh', repo.git_url, repo.name]);
           break;
